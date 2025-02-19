@@ -12,5 +12,4 @@ import lombok.NoArgsConstructor;
 public class PostUrlRequest {
     private String alias;
     private String longUrl;
-    private String domainId;
 }

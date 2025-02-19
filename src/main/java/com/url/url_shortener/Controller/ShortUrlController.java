@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.url.url_shortener.DTO.UrlShortenerDTO.Request.PostUrlRequest;
 import com.url.url_shortener.DTO.UrlShortenerDTO.Response.PostUrlResponse;
 import com.url.url_shortener.Entity.ShortUrl;
+import com.url.url_shortener.Exceptions.InvalidRequest;
+import com.url.url_shortener.Exceptions.ResourceNotFound;
 import com.url.url_shortener.Repository.ShortUrlRepository;
 import com.url.url_shortener.Service.UrlService;
 
@@ -30,14 +32,19 @@ public class ShortUrlController {
     ShortUrlRepository shortUrlRepository;
     @PostMapping("/api/url/shortener")
     public ResponseEntity<PostUrlResponse> urlShortener(@RequestBody PostUrlRequest request, @RequestHeader("Authorization") String authToken) {
-        System.out.println("authToken : " + authToken);
+        if(request == null) {
+            throw new InvalidRequest("Request body needed");
+        }
         PostUrlResponse response = urlService.urlShortenerService(request, authToken);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("{request}")
     public ResponseEntity<Void> urlRedirect(@PathVariable String request) {
         ShortUrl shortUrl = shortUrlRepository.findByShortenedUrl(request);
+        if(shortUrl == null) {
+            throw new ResourceNotFound("URL not found : " + request);
+        }
         return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(shortUrl.getLongUrl())).build();
     }
 }

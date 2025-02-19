@@ -12,6 +12,7 @@ import com.url.url_shortener.DTO.UrlShortenerDTO.Request.PostUrlRequest;
 import com.url.url_shortener.DTO.UrlShortenerDTO.Response.PostUrlResponse;
 import com.url.url_shortener.Entity.ShortUrl;
 import com.url.url_shortener.Entity.User;
+import com.url.url_shortener.Exceptions.InvalidRequest;
 import com.url.url_shortener.Repository.ShortUrlRepository;
 import com.url.url_shortener.Repository.UserRepository;
 import com.url.url_shortener.Utils.JwtUtil;
@@ -28,7 +29,14 @@ public class UrlService {
     JwtUtil jwtUtil;
 
     public PostUrlResponse urlShortenerService(PostUrlRequest request, String authToken) {
+        if(request.getLongUrl() == null) {
+            throw new InvalidRequest("longUrl field cannot be null");
+        }
+        if(shortUrlRepository.existsByLongUrl(request.getLongUrl())) {
+            throw new InvalidRequest("URL already exists");
+        }
         validateUrl(request.getLongUrl());
+        
         String shortenedUrl;
         if(request.getAlias() != null) {
             checkAliasUnique(request.getAlias());
@@ -45,8 +53,6 @@ public class UrlService {
 
         Optional<User> user = userRepository.findById(jwtUtil.extractId(authToken));
 
-        System.out.println("user id : " + user.get().getId());
-
         ShortUrl shortUrl = new ShortUrl();
         shortUrl.setLongUrl(request.getLongUrl());
         shortUrl.setShortenedUrl(shortenedUrl);
@@ -60,17 +66,27 @@ public class UrlService {
         return response;
     }
 
-    private void validateUrl(String url) {
-        try {
-            new URI(url);
-        } catch (URISyntaxException e) {
-            // throw new InvalidUrlException("Invalid URL provided");
+private void validateUrl(String url) {
+    try {
+        URI parsedUrl = new URI(url);
+        String scheme = parsedUrl.getScheme();
+        if(scheme == null) {
+            throw new InvalidRequest("Invalid URL scheme. Only HTTP and HTTPS are supported.");
         }
+        if (!scheme.equalsIgnoreCase("http") && !scheme.equalsIgnoreCase("https")) {
+            throw new InvalidRequest("Invalid URL scheme. Only HTTP and HTTPS are supported.");
+        }
+        if (parsedUrl.getHost() == null || parsedUrl.getHost().isEmpty()) {
+            throw new InvalidRequest("Invalid URL: Host is missing.");
+        }
+    } catch (URISyntaxException e) {
+        throw new InvalidRequest("Invalid URL syntax.");
     }
+}
 
     private void checkAliasUnique(String alias) {
         if(shortUrlRepository.existsByAlias(alias)) {
-            // throw new Exception("alias Exists");
+            throw new InvalidRequest("Alias already exists");
         }
     }
 

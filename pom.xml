@@ -80,6 +80,18 @@
 			<version>0.12.3</version>
 			<scope>runtime</scope>
 		</dependency>
+		
+		<!-- Spring Boot Starter Data Redis -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+
+		<!-- Spring Boot Starter Cache -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-cache</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
