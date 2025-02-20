@@ -9,6 +9,7 @@ import com.url.url_shortener.Entity.ShortUrl;
 import com.url.url_shortener.Exceptions.InvalidRequest;
 import com.url.url_shortener.Exceptions.ResourceNotFound;
 import com.url.url_shortener.Repository.ShortUrlRepository;
+import com.url.url_shortener.Service.ShortUrlHitService;
 import com.url.url_shortener.Service.UrlService;
 
 import java.net.URI;
@@ -30,6 +31,9 @@ public class ShortUrlController {
     UrlService urlService;
     @Autowired
     ShortUrlRepository shortUrlRepository;
+    @Autowired
+    ShortUrlHitService service;
+
     @PostMapping("/api/url/shortener")
     public ResponseEntity<PostUrlResponse> urlShortener(@RequestBody PostUrlRequest request, @RequestHeader("Authorization") String authToken) {
         if(request == null) {
@@ -41,7 +45,7 @@ public class ShortUrlController {
 
     @GetMapping("{request}")
     public ResponseEntity<Void> urlRedirect(@PathVariable String request) {
-        ShortUrl shortUrl = shortUrlRepository.findByShortenedUrl(request);
+        ShortUrl shortUrl = service.findShortUrl(request);
         if(shortUrl == null) {
             throw new ResourceNotFound("URL not found : " + request);
         }

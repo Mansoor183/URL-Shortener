@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
 @ControllerAdvice
-public class GolbalExcaptions {
+public class GlobalExceptions {
 
     @ExceptionHandler(ResourceNotFound.class)
-    public ResponseEntity<Object> handleResponseEntity(ResourceNotFound exception, WebRequest request) {
+    public ResponseEntity<Object> handleResourceNotFound(ResourceNotFound exception, WebRequest request) {
         Map<String, Object> resBody = new HashMap<>();
         resBody.put("timestamp", new Date());
         resBody.put("status", HttpStatus.NOT_FOUND.value());
@@ -25,7 +25,7 @@ public class GolbalExcaptions {
     }
 
     @ExceptionHandler(InvalidRequest.class)
-    public ResponseEntity<Object> handleInvalidResponse(InvalidRequest exception, WebRequest request) {
+    public ResponseEntity<Object> handleInvalidRequest(InvalidRequest exception, WebRequest request) {
         Map<String, Object> resBody = new HashMap<>();
         resBody.put("timestamp", new Date());
         resBody.put("status", HttpStatus.BAD_REQUEST.value());
@@ -33,5 +33,16 @@ public class GolbalExcaptions {
         resBody.put("message", exception.getMessage());
         resBody.put("path", request.getDescription(false));
         return new ResponseEntity<>(resBody, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<Object> handleUnauthorizedException(UnauthorizedException exception, WebRequest request) {
+        Map<String, Object> resBody = new HashMap<>();
+        resBody.put("timestamp", new Date());
+        resBody.put("status", HttpStatus.UNAUTHORIZED.value());
+        resBody.put("error", "Unauthorized");
+        resBody.put("message", exception.getMessage());
+        resBody.put("path", request.getDescription(false));
+        return new ResponseEntity<>(resBody, HttpStatus.UNAUTHORIZED);
     }
 }

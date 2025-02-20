@@ -7,8 +7,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.url.url_shortener.Utils.UserRole;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -39,8 +37,6 @@ public class User implements UserDetails{
     private String email;
     @Column(name = "password", nullable = false)
     private String password;
-    @Column(name = "role", nullable = false)
-    private UserRole role;
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     @Column(name = "updated_at")
