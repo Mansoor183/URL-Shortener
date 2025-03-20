@@ -1,5 +1,6 @@
 package com.url.url_shortener.Service;
 
+import com.url.url_shortener.Exceptions.ResourceNotFound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -58,8 +59,9 @@ public class AuthenticationService {
                                         request.getPassword()
                                 )
                         );
+                        
                         var user = userRepository.findByUsername(request.getUsername())
-                                .orElseThrow();
+                                .orElseThrow(() -> new ResourceNotFound("Username not found"));
                         String jwtToken = jwtService.generateToken(user);
                         return AuthenticationResponse.builder()
                                 .token(jwtToken)
