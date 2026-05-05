@@ -41,7 +41,7 @@ public class AuthController {
     }
 
     @PostMapping("logout")
-    public ResponseEntity<HashMap<String, String>> logout(@RequestBody RefreshTokenRequest request) {
+    public ResponseEntity<HashMap<String, String>> logoutFun(@RequestBody RefreshTokenRequest request) {
         authenticationService.logout(request.getRefreshToken());
         HashMap<String, String> response = new HashMap<>();
         response.put("message", "Logged out successfully");
