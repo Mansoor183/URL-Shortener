@@ -2,7 +2,6 @@ package com.url.url_shortener.DTO.Auth.Response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,10 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthenticationResponse {
+public class TokenPair {
     private String accessToken;
     private String refreshToken;
-    private long expiresIn;
-    @Default
-    private String tokenType = "Bearer";
 }

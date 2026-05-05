@@ -1,6 +1,5 @@
 package com.url.url_shortener.DTO.Auth.Request;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,12 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterRequest {
+public class RefreshTokenRequest {
     @NotNull
-    private String username;
-    @Email
-    private String email;
-    @NotNull
-    private String password;
-    private String Role;
+    private String refreshToken;
 }
