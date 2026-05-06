@@ -5,10 +5,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.url.url_shortener.DTO.UrlShortenerDTO.Request.PostUrlRequest;
 import com.url.url_shortener.DTO.UrlShortenerDTO.Response.PostUrlResponse;
+import com.url.url_shortener.Entity.User;
 import com.url.url_shortener.Exceptions.InvalidRequest;
 import com.url.url_shortener.Exceptions.ResourceNotFound;
+import com.url.url_shortener.Exceptions.UnauthorizedException;
 import com.url.url_shortener.Repository.ShortUrlRepository;
 import com.url.url_shortener.Service.UrlService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import java.net.URI;
 import java.util.Optional;
@@ -18,7 +21,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -32,11 +34,14 @@ public class ShortUrlController {
     ShortUrlRepository shortUrlRepository;
 
     @PostMapping("/api/url/shortener")
-    public ResponseEntity<PostUrlResponse> urlShortener(@RequestBody PostUrlRequest request, @RequestHeader("Authorization") String authToken) {
+    public ResponseEntity<PostUrlResponse> urlShortener(@RequestBody PostUrlRequest request, @AuthenticationPrincipal User authenticatedUser) {
         if(request == null) {
             throw new InvalidRequest("Request body needed");
         }
-        PostUrlResponse response = urlService.urlShortenerService(request, authToken);
+        if(authenticatedUser == null) {
+            throw new UnauthorizedException("User must be authenticated");
+        }
+        PostUrlResponse response = urlService.urlShortenerService(request, authenticatedUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

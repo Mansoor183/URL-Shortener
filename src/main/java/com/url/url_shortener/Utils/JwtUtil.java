@@ -35,6 +35,7 @@ public class JwtUtil {
     }
 
     public <T> T extractClaim(String token,  Function<Claims, T> claimsResolver) {
+        token = getTokenFromHeader(token);
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
@@ -159,12 +160,12 @@ public class JwtUtil {
     }
 
     public String extractId(String token) {
-        token = token.substring(7);
-        Claims claims = extractAllClaims(token);
-        return claims.get("id", String.class);
+        token = getTokenFromHeader(token);
+        return extractClaim(token, Claims::getSubject);
     }
 
     private Claims extractAllClaims(String token) {
+        token = getTokenFromHeader(token);
         SecretKey secretKey = Keys.hmacShaKeyFor(getSignInKey().getEncoded());
         return Jwts
                 .parser()
@@ -172,6 +173,13 @@ public class JwtUtil {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+    private String getTokenFromHeader(String token) {
+        if (token != null && token.startsWith("Bearer ")) {
+            return token.substring(7);
+        }
+        return token;
     }
 
     private Key getSignInKey() {

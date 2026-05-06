@@ -13,22 +13,18 @@ import com.url.url_shortener.DTO.UrlShortenerDTO.Response.PostUrlResponse;
 import com.url.url_shortener.Entity.ShortUrl;
 import com.url.url_shortener.Entity.User;
 import com.url.url_shortener.Exceptions.InvalidRequest;
+import com.url.url_shortener.Exceptions.UnauthorizedException;
 import com.url.url_shortener.Repository.ShortUrlRepository;
-import com.url.url_shortener.Repository.UserRepository;
-import com.url.url_shortener.Utils.JwtUtil;
 
 @Service
 public class UrlService {
     @Autowired
     ShortUrlRepository shortUrlRepository;
 
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    JwtUtil jwtUtil;
-
-    public PostUrlResponse urlShortenerService(PostUrlRequest request, String authToken) {
+    public PostUrlResponse urlShortenerService(PostUrlRequest request, User authenticatedUser) {
+        if (authenticatedUser == null) {
+            throw new UnauthorizedException("User must be authenticated");
+        }
         if(request.getLongUrl() == null) {
             throw new InvalidRequest("longUrl field cannot be null");
         }
@@ -51,13 +47,11 @@ public class UrlService {
         }
 
 
-        Optional<User> user = userRepository.findById(jwtUtil.extractId(authToken));
-
         ShortUrl shortUrl = new ShortUrl();
         shortUrl.setLongUrl(request.getLongUrl());
         shortUrl.setShortenedUrl(shortenedUrl);
         shortUrl.setAlias(request.getAlias());
-        shortUrl.setCreatedBy(user.get());
+        shortUrl.setCreatedBy(authenticatedUser);
         shortUrlRepository.save(shortUrl);
 
         PostUrlResponse response = new PostUrlResponse();
